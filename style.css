@@ -1,6 +1,48 @@
-body { font-family: Arial; background:#f2f2f2; margin:0; padding:0; }
-#app { max-width:600px; margin:20px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
-#messages { height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:10px;}
-textarea { width:100%; height:50px; margin-bottom:5px;}
-button { padding:5px 10px; margin:2px;}
-#contacts-list button { display:block; margin:2px 0; width:100%; text-align:left;}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANDESH Web App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <h1>SANDESH</h1>
+
+  <!-- Login -->
+  <div id="login">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="login-btn">Login / Signup</button>
+  </div>
+
+  <!-- Main UI -->
+  <div id="main-ui" style="display:none;">
+    <div id="sidebar">
+      <h3>Contacts</h3>
+      <div id="contacts-list"></div>
+
+      <h3>Groups/Channels</h3>
+      <div id="channels-list"></div>
+    </div>
+
+    <div id="chat-window">
+      <div id="messages"></div>
+      <textarea id="new-message" placeholder="Type a message..."></textarea>
+      <button id="send-btn">Send</button>
+    </div>
+
+    <div id="status-window">
+      <h3>Status</h3>
+      <input type="file" id="status-upload">
+      <button id="upload-status-btn">Post Status</button>
+      <div id="statuses"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="crypto.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

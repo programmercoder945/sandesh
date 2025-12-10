@@ -1,23 +1,10 @@
-export async function generateAESKey() {
-  return crypto.subtle.generateKey({ name:"AES-GCM", length:256 }, true, ["encrypt","decrypt"])
-}
-
-export async function encryptAES(key, data) {
-  const iv = crypto.getRandomValues(new Uint8Array(12))
-  const encData = await crypto.subtle.encrypt({ name:"AES-GCM", iv }, key, new TextEncoder().encode(data))
-  return { encData, iv }
-}
-
-export async function decryptAES(key, encData, iv) {
-  const dec = await crypto.subtle.decrypt({ name:"AES-GCM", iv }, key, encData)
-  return new TextDecoder().decode(dec)
-}
-
-// Simple wrapper parser for ^^html/markdown^^
-export function parseMessage(msg) {
-  const htmlMatch = msg.match(/\^\^\(html\)\^\^([\s\S]*)\^\^$/)
-  const mdMatch = msg.match(/\^\^\(markdown\)\^\^([\s\S]*)\^\^$/)
-  if(htmlMatch) return htmlMatch[1]
-  if(mdMatch) return mdMatch[1] // in full app, convert Markdown to HTML
-  return msg
-}
+body { font-family: Arial; background:#f2f2f2; margin:0; padding:0; }
+#app { max-width:900px; margin:20px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+#sidebar { float:left; width:30%; padding-right:10px; }
+#chat-window { float:left; width:40%; }
+#status-window { float:left; width:25%; }
+#messages { height:400px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:10px;}
+textarea { width:100%; height:50px; margin-bottom:5px;}
+button { padding:5px 10px; margin:2px;}
+#contacts-list button, #channels-list button { display:block; width:100%; margin:2px 0; text-align:left; }
+.clearfix::after { content:""; display:table; clear:both; }

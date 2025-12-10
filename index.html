@@ -3,31 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SANDESH 1-1 Chat</title>
+<title>SANDESH Web App</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <h1>SANDESH 1-1 Chat</h1>
+<div id="app">
+  <h1>SANDESH</h1>
 
-    <div id="login">
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <button id="login-btn">Login / Signup</button>
-    </div>
-
-    <div id="chat-ui" style="display:none;">
-      <div id="contacts-list"></div>
-
-      <div id="message-window">
-        <div id="messages"></div>
-        <textarea id="new-message" placeholder="Type a message..."></textarea>
-        <button id="send-btn">Send</button>
-      </div>
-    </div>
+  <!-- Login -->
+  <div id="login">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="login-btn">Login / Signup</button>
   </div>
 
-  <script type="module" src="crypto.js"></script>
-  <script type="module" src="app.js"></script>
+  <!-- Main UI -->
+  <div id="main-ui" style="display:none;">
+    <div id="sidebar">
+      <h3>Contacts</h3>
+      <div id="contacts-list"></div>
+
+      <h3>Groups/Channels</h3>
+      <div id="channels-list"></div>
+    </div>
+
+    <div id="chat-window">
+      <div id="messages"></div>
+      <textarea id="new-message" placeholder="Type a message..."></textarea>
+      <button id="send-btn">Send</button>
+    </div>
+
+    <div id="status-window">
+      <h3>Status</h3>
+      <input type="file" id="status-upload">
+      <button id="upload-status-btn">Post Status</button>
+      <div id="statuses"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="crypto.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
