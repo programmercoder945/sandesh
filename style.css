@@ -1,5 +1,6 @@
 body { font-family: Arial; background:#f2f2f2; margin:0; padding:0; }
-#app { max-width:800px; margin:20px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+#app { max-width:600px; margin:20px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
 #messages { height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:10px;}
-textarea { width:100%; height:50px;}
+textarea { width:100%; height:50px; margin-bottom:5px;}
 button { padding:5px 10px; margin:2px;}
+#contacts-list button { display:block; margin:2px 0; width:100%; text-align:left;}

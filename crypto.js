@@ -1,9 +1,5 @@
-export async function generateKeyPair() {
-  return crypto.subtle.generateKey(
-    { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1,0,1]), hash: "SHA-256" },
-    true,
-    ["encrypt", "decrypt"]
-  )
+export async function generateAESKey() {
+  return crypto.subtle.generateKey({ name:"AES-GCM", length:256 }, true, ["encrypt","decrypt"])
 }
 
 export async function encryptAES(key, data) {
@@ -13,22 +9,15 @@ export async function encryptAES(key, data) {
 }
 
 export async function decryptAES(key, encData, iv) {
-  const decrypted = await crypto.subtle.decrypt({ name:"AES-GCM", iv }, key, encData)
-  return new TextDecoder().decode(decrypted)
+  const dec = await crypto.subtle.decrypt({ name:"AES-GCM", iv }, key, encData)
+  return new TextDecoder().decode(dec)
 }
 
-export async function importPublicKey(rawKey) {
-  return crypto.subtle.importKey("spki", rawKey, { name:"RSA-OAEP", hash:"SHA-256" }, true, ["encrypt"])
-}
-
-export async function importPrivateKey(rawKey) {
-  return crypto.subtle.importKey("pkcs8", rawKey, { name:"RSA-OAEP", hash:"SHA-256" }, true, ["decrypt"])
-}
-
-export async function encryptKeyRSA(publicKey, key) {
-  return crypto.subtle.encrypt({ name:"RSA-OAEP" }, publicKey, key)
-}
-
-export async function decryptKeyRSA(privateKey, encryptedKey) {
-  return crypto.subtle.decrypt({ name:"RSA-OAEP" }, privateKey, encryptedKey)
+// Simple wrapper parser for ^^html/markdown^^
+export function parseMessage(msg) {
+  const htmlMatch = msg.match(/\^\^\(html\)\^\^([\s\S]*)\^\^$/)
+  const mdMatch = msg.match(/\^\^\(markdown\)\^\^([\s\S]*)\^\^$/)
+  if(htmlMatch) return htmlMatch[1]
+  if(mdMatch) return mdMatch[1] // in full app, convert Markdown to HTML
+  return msg
 }

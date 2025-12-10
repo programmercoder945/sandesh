@@ -10,16 +10,14 @@ let currentChatId = null
 let aesKey = null
 
 const loginBtn = document.getElementById('login-btn')
-const mainUI = document.getElementById('main-ui')
+const chatUI = document.getElementById('chat-ui')
 const loginDiv = document.getElementById('login')
 const messagesDiv = document.getElementById('messages')
 const sendBtn = document.getElementById('send-btn')
 const newMessage = document.getElementById('new-message')
-const chatList = document.getElementById('chat-list')
-const communitiesList = document.getElementById('communities-list')
-const channelsList = document.getElementById('channels-list')
+const contactsList = document.getElementById('contacts-list')
 
-// Login / Signup
+// Login/signup
 loginBtn.onclick = async () => {
   const email = document.getElementById('email').value
   const password = document.getElementById('password').value
@@ -27,58 +25,60 @@ loginBtn.onclick = async () => {
   if(error){
     const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
     user = data.user
-    if(signUpError) { alert(signUpError.message); return }
+    if(signUpError){ alert(signUpError.message); return }
   }
   currentUser = user
   loginDiv.style.display = 'none'
-  mainUI.style.display = 'block'
-  aesKey = await crypto.generateKeyPair() // simple skeleton for per-user key
-  loadCommunities()
+  chatUI.style.display = 'block'
+  aesKey = await crypto.generateAESKey()
+  loadContacts()
 }
 
-// Load communities
-async function loadCommunities() {
-  const { data: communities } = await supabase.from('communities').select('*')
-  communitiesList.innerHTML = ''
-  communities.forEach(c => {
+// Load other users as contacts
+async function loadContacts() {
+  const { data: users } = await supabase.from('profiles').select('*').neq('id', currentUser.id)
+  contactsList.innerHTML = ''
+  users.forEach(u => {
     const btn = document.createElement('button')
-    btn.textContent = c.title
-    btn.onclick = () => loadChannels(c.id)
-    communitiesList.appendChild(btn)
+    btn.textContent = u.name || u.id
+    btn.onclick = () => openChatWith(u.id)
+    contactsList.appendChild(btn)
   })
 }
 
-// Load channels
-async function loadChannels(communityId) {
-  const { data: channels } = await supabase.from('channels').select('*').eq('community_id', communityId)
-  channelsList.innerHTML = ''
-  channels.forEach(ch => {
-    const btn = document.createElement('button')
-    btn.textContent = ch.title
-    btn.onclick = () => openChat(ch.id)
-    channelsList.appendChild(btn)
-  })
-}
-
-// Open chat (channel or 1-1)
-async function openChat(chatId) {
-  currentChatId = chatId
+// Open 1-1 chat
+async function openChatWith(otherUserId) {
+  // Check if chat exists
+  let { data: chats } = await supabase.from('chats').select('*').contains('members', [currentUser.id, otherUserId])
+  let chat = chats[0]
+  if(!chat){
+    const { data } = await supabase.from('chats').insert([{ is_group:false, members:[currentUser.id, otherUserId] }])
+    chat = data[0]
+  }
+  currentChatId = chat.id
   messagesDiv.innerHTML = ''
+  subscribeMessages(currentChatId)
+}
 
-  // Realtime subscription for messages
+// Subscribe to realtime messages
+function subscribeMessages(chatId){
   supabase.from(`messages:chat_id=eq.${chatId}`).on('INSERT', payload => {
     displayMessage(payload.new)
   }).subscribe()
 
-  // Load existing messages
+  loadMessages(chatId)
+}
+
+// Load existing messages
+async function loadMessages(chatId){
   const { data: msgs } = await supabase.from('messages').select('*').eq('chat_id', chatId)
   msgs.forEach(displayMessage)
 }
 
-// Display message (decrypt skeleton)
-function displayMessage(msg) {
+// Display message
+function displayMessage(msg){
   const div = document.createElement('div')
-  div.textContent = msg.content // replace with decryptAES when implementing
+  div.textContent = crypto.parseMessage(msg.content)
   messagesDiv.appendChild(div)
   messagesDiv.scrollTop = messagesDiv.scrollHeight
 }
@@ -86,7 +86,7 @@ function displayMessage(msg) {
 // Send message
 sendBtn.onclick = async () => {
   if(!currentChatId) return
-  const content = newMessage.value // replace with encryptAES
+  const content = newMessage.value // replace with AES encryption
   await supabase.from('messages').insert([{ chat_id: currentChatId, sender: currentUser.id, content }])
   newMessage.value = ''
 }
