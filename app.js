@@ -21,16 +21,49 @@ const contactsList = document.getElementById('contacts-list')
 loginBtn.onclick = async () => {
   const email = document.getElementById('email').value
   const password = document.getElementById('password').value
-  let { user, error } = await supabase.auth.signInWithPassword({ email, password })
-  if(error){
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
-    user = data.user
-    if(signUpError){ alert(signUpError.message); return }
+
+  if(!email || !password){ 
+    alert("Enter email and password"); 
+    return 
   }
-  currentUser = user
+
+  let currentUser = null
+
+  // Try signing in
+  let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+  
+  if(signInError || !signInData.user){
+    // If sign in fails, try signing up
+    let { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password })
+    if(signUpError){ 
+      alert("Signup failed: " + signUpError.message)
+      return
+    }
+    currentUser = signUpData.user
+  } else {
+    currentUser = signInData.user
+  }
+
+  if(!currentUser){
+    alert("Login failed")
+    return
+  }
+
+  // Insert profile if not exists
+  await supabase.from('profiles').upsert({
+    id: currentUser.id,
+    name: email.split('@')[0],
+    last_seen: new Date().toISOString()
+  })
+
+  // Hide login UI, show chat UI
   loginDiv.style.display = 'none'
   chatUI.style.display = 'block'
+
+  // Generate per-user AES key (for E2EE skeleton)
   aesKey = await crypto.generateAESKey()
+
+  // Load contacts immediately
   loadContacts()
 }
 
